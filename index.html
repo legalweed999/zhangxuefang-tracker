@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zhangxuefang 减脂看板 🦞</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 30%, #FFB74D 60%, #0066CC 100%);
+    background-attachment: fixed;
+    color: #333366;
+    padding: 16px;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 183, 77, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(129, 199, 132, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 183, 77, 0.08) 0%, transparent 50%);
+    z-index: -1;
+    animation: float 20s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(20px, -20px) rotate(1deg); }
+    66% { transform: translate(-10px, 15px) rotate(-1deg); }
+  }
+
+  h1 {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #FF7F00, #FFB74D, #0066CC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+  .stat-card {
+    padding: 16px 10px;
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card .label { font-size: 0.78em; color: #0066CC; font-weight: 500; letter-spacing: 0.5px; }
+  .stat-card .value {
+    font-size: 1.6em;
+    font-weight: 800;
+    margin-top: 4px;
+    background: linear-gradient(135deg, #FF7F00, #FF8C00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-card .value.accent {
+    background: linear-gradient(135deg, #4caf50, #81c784);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-card .sub { font-size: 0.72em; color: #004080; margin-top: 3px; }
+
+  .chart-container {
+    padding: 20px 16px;
+    margin: 16px 0;
+  }
+
+  .section-title {
+    font-size: 1.05em;
+    font-weight: 700;
+    color: #FF7F00;
+    margin: 24px 0 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .weekly { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 10px 0; }
+  .week-card {
+    padding: 14px;
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+  .week-card:hover { transform: translateY(-2px); }
+  .week-card .wk { font-size: 0.78em; color: #0066CC; }
+  .week-card .wv {
+    font-size: 1.3em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #FF7F00, #FF8C00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 4px 0;
+  }
+
+  .table-wrap {
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 0 20px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: linear-gradient(135deg, rgba(255, 127, 0, 0.85), rgba(255, 140, 0, 0.85));
+    backdrop-filter: blur(10px);
+    color: #fff;
+    padding: 12px 8px;
+    font-size: 0.82em;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 0.84em;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: transparent;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255, 127, 0, 0.04); }
+
+  .weight-down { color: #27ae60; font-weight: 700; }
+  .weight-up { color: #e74c3c; font-weight: 700; }
+  .weight-same { color: #004080; }
+  .exercise-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(233,30,99,0.15), rgba(76,175,80,0.12));
+    color: #4caf50;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 0.75em;
+    font-weight: 500;
+    border: 1px solid rgba(233,30,99,0.15);
+  }
+
+  .footer {
+    text-align: center;
+    color: #0066CC;
+    font-size: 0.72em;
+    margin: 24px 0;
+    letter-spacing: 0.5px;
+  }
+  .footer .brand-line { font-size: 0.72em; color: #0066CC; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .footer .thank-line { font-size: 0.72em; color: #0066CC; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .footer .motto-line { font-size: 0.82em; font-weight: bold; color: #333; letter-spacing: 1px; margin-bottom: 16px; }
+  .footer .footer-logo { width: 40%; max-width: 588px; height: auto; display: block; margin: 0 auto; }
+
+
+  .progress-wrap { margin: 16px 0; padding: 16px 20px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.8em; color: #0066CC; margin-bottom: 8px; }
+  .progress-bar {
+    height: 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #FF8C00, #FF7F00, #4caf50);
+    transition: width 1s ease;
+    box-shadow: 0 2px 8px rgba(233,30,99,0.3);
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 1.1em;
+  }
+  .no-data .emoji { font-size: 3em; margin-bottom: 16px; }
+
+  /* Carousel */
+  .carousel-wrap { position: relative; overflow: hidden; margin: 10px 0; }
+  .carousel-track { display: flex; transition: transform 0.35s ease; touch-action: pan-y; }
+  .carousel-card { min-width: 100%; box-sizing: border-box; padding: 16px; }
+  .carousel-card .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .carousel-card .cc-meal { font-size: 1em; font-weight: 700; color: #FF7F00; }
+  .carousel-card .cc-cal { font-size: 0.9em; font-weight: 600; color: #0066CC; }
+  .carousel-card .cc-photo { width: 100%; border-radius: 12px; margin-bottom: 12px; object-fit: cover; max-height: 280px; }
+  .cc-collage { display: grid; gap: 4px; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .cc-collage img { width: 100%; height: 100%; object-fit: cover; }
+  .cc-collage-2 { grid-template-columns: 1fr 1fr; aspect-ratio: 2/1; }
+  .cc-collage-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .cc-collage-3 img:first-child { grid-row: 1/3; }
+  .cc-collage-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; aspect-ratio: 1; }
+  .carousel-card .cc-items { margin-bottom: 10px; }
+  .carousel-card .cc-item { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.85em; color: #333366; border-bottom: 1px solid rgba(233,30,99,0.06); }
+  .carousel-card .cc-item:last-child { border-bottom: none; }
+  .carousel-card .cc-macros { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .carousel-card .cc-macros span { background: rgba(233,30,99,0.08); padding: 3px 10px; border-radius: 8px; font-size: 0.78em; color: #0066CC; font-weight: 500; }
+  .carousel-dots { display: flex; justify-content: center; gap: 8px; padding: 12px 0; }
+  .carousel-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(233,30,99,0.2); cursor: pointer; transition: all 0.2s; }
+  .carousel-dots .dot.active { background: #FF7F00; transform: scale(1.3); }
+  .carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(233,30,99,0.15); border: none; color: #FF7F00; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 2; }
+  .carousel-nav:hover { background: rgba(233,30,99,0.3); }
+  .carousel-nav.prev { left: 6px; }
+  .carousel-nav.next { right: 6px; }
+  .carousel-nav:disabled { opacity: 0.3; cursor: default; }
+  .no-meals { text-align: center; padding: 30px; color: #004080; font-size: 0.9em; }
+
+  /* Body comp tooltip */
+  .body-info { position: relative; display: inline; }
+  .body-info .info-icon { font-size: 0.65em; color: #FF7F00; cursor: pointer; vertical-align: super; margin-left: 2px; opacity: 0.7; }
+  .body-info .info-icon:hover { opacity: 1; }
+  .body-tip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: rgba(255,240,245,0.97); border: 1px solid rgba(233,30,99,0.15); border-radius: 10px; padding: 10px 14px; font-size: 0.75em; white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 10; color: #003366; line-height: 1.8; }
+  .body-tip.show { display: block; }
+  .body-tip .tip-row { display: flex; justify-content: space-between; gap: 16px; }
+  .body-tip .tip-label { color: #0066CC; font-weight: 500; }
+  .body-tip .tip-val { font-weight: 700; }
+
+  /* Tabs */
+  .tabs { display: flex; border-radius: 16px 16px 0 0; overflow: hidden; margin-top: 24px; margin-bottom: 0; border-bottom: none; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .tab { flex: 1; text-align: center; padding: 14px; font-size: 0.9em; font-weight: 600; color: #0066CC; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.3); }
+  .tab.active { background: rgba(255,255,255,0.6); color: #FF7F00; border-bottom: 2px solid #FF7F00; }
+  .tab:not(.active):hover { background: rgba(255,255,255,0.45); }
+  .tab-content { margin-bottom: 20px; }
+
+  /* Diet history */
+  .diet-day { margin: 8px 0; padding: 0; overflow: hidden; }
+  .diet-day-header { font-size: 0.9em; font-weight: 600; color: #0066CC; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .diet-day-header .day-cal { font-size: 0.85em; color: #FF7F00; font-weight: 600; }
+  .diet-day-header .toggle-icon { font-size: 0.8em; color: #FF7F00; transition: transform 0.2s; }
+  .diet-day-header .toggle-icon.open { transform: rotate(90deg); }
+  .diet-day-body { display: none; padding: 0 16px 16px; }
+  .diet-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .diet-gallery img { width: 100%; border-radius: 10px; object-fit: cover; aspect-ratio: 1; cursor: pointer; transition: transform 0.2s; }
+  .diet-gallery img:hover { transform: scale(1.03); }
+  .diet-detail-table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+  .diet-detail-table th { background: rgba(233,30,99,0.1); color: #0066CC; padding: 8px 6px; text-align: center; font-weight: 600; }
+  .diet-detail-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid rgba(233,30,99,0.06); }
+  .diet-detail-table tr:last-child td { border-bottom: none; font-weight: 700; color: #FF7F00; }
+</style>
+</head>
+<body>
+
+<h1>⭐ zhangxuefang 的体重记录</h1>
+
+<div class="stats">
+  <div class="stat-card glass">
+    <div class="label">起始体重</div>
+    <div class="value" id="startW">--</div>
+    <div class="sub" id="startDate"></div>
+  </div>
+  <div class="stat-card glass">
+    <div class="label">今日体重</div>
+    <div class="value" id="currentW">--</div>
+    <div class="sub" id="currentDate"></div>
+  </div>
+  <div class="stat-card glass">
+    <div class="label">已减</div>
+    <div class="value" id="totalLoss">--</div>
+    <div class="sub" id="totalDays"></div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card glass">
+    <div class="label">目标</div>
+    <div class="value accent" id="goalW">--</div>
+    <div class="sub" id="goalDate"></div>
+  </div>
+  <div class="stat-card glass">
+    <div class="label">距目标</div>
+    <div class="value accent" id="toGoal">--</div>
+    <div class="sub">还差</div>
+  </div>
+  <div class="stat-card glass">
+    <div class="label">周均减重</div>
+    <div class="value" id="weeklyAvg">--</div>
+    <div class="sub">kg/周</div>
+  </div>
+</div>
+
+<div class="progress-wrap glass">
+  <div class="progress-label">
+    <span id="pStart">--</span>
+    <span id="pPercent">0%</span>
+    <span id="pGoal">--</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+</div>
+
+<div class="chart-container glass-strong">
+  <canvas id="weightChart" height="200"></canvas>
+</div>
+
+<div class="section-title">🍽️ 今日饮食</div>
+<div class="today-summary glass-strong" id="todaySummary" style="display:none; padding:16px; margin:10px 0;">
+  <div class="stats" style="margin:0;">
+    <div class="stat-card" style="padding:10px;">
+      <div class="label">总热量</div>
+      <div class="value" id="todayCal">--</div>
+      <div class="sub"><span id="todayCalTarget"></span></div>
+    </div>
+    <div class="stat-card" style="padding:10px;">
+      <div class="label">蛋白质</div>
+      <div class="value" id="todayP">--</div>
+      <div class="sub"><span id="todayPTarget"></span></div>
+    </div>
+    <div class="stat-card" style="padding:10px;">
+      <div class="label">碳水</div>
+      <div class="value" id="todayC">--</div>
+      <div class="sub"><span id="todayCTarget"></span></div>
+    </div>
+  </div>
+  <div class="stats" style="margin:8px 0 0;">
+    <div class="stat-card" style="padding:10px;">
+      <div class="label">脂肪</div>
+      <div class="value" id="todayF">--</div>
+      <div class="sub"><span id="todayFTarget"></span></div>
+    </div>
+    <div class="stat-card" style="padding:10px;">
+      <div class="label">纤维</div>
+      <div class="value" id="todayFiber">--</div>
+      <div class="sub">g</div>
+    </div>
+    <div class="stat-card" style="padding:10px;">
+      <div class="label">餐次</div>
+      <div class="value" id="todayCount">--</div>
+      <div class="sub">次</div>
+    </div>
+  </div>
+</div>
+<div class="carousel-wrap" id="todayCarousel">
+  <div class="carousel-track" id="todayTrack"></div>
+  <div class="carousel-dots" id="todayDots"></div>
+</div>
+
+<div class="tabs glass-strong">
+  <div class="tab active" data-tab="weight">📋 每日明细</div>
+  <div class="tab" data-tab="diet">🍽️ 每日饮食</div>
+</div>
+
+<div class="tab-content" id="tab-weight">
+<div class="table-wrap glass-strong" style="margin-top:0; border-top-left-radius:0; border-top-right-radius:0;">
+<table>
+  <thead>
+    <tr><th>日期</th><th>星期</th><th>体重</th><th>变化</th><th>运动</th><th>备注</th></tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+</div>
+</div>
+
+<div class="tab-content" id="tab-diet" style="display:none;">
+<div id="dietHistory"></div>
+</div>
+
+<div class="section-title">📊 每周汇总</div>
+<div class="weekly" id="weeklyCards"></div>
+
+<div class="footer">
+  <div class="brand-line">虾教练·为zhangxuefang定制</div>
+  <div class="thank-line">感谢Xiaohan一直以来的支持与鼓励</div>
+  <div class="motto-line">让我们遇见更好的自己，帮人们过上更好的生活</div>
+  <img src="nglogo.png" alt="NG Logo" class="footer-logo">
+</div>
+
+<script>
+// ===== zhangxuefang 的数据 =====
+// 每次更新在这里添加记录即可
+
+// Daily targets
+const DAILY_TARGET = { cal: 1750, protein: 160, carbs: 165, fat: 50 };
+function f(n) { return Number(n).toFixed(1); }
+
+// ===== 用户数据区 =====
+// 在这里填入用户的数据即可
+
+// 每日营养目标（按用户情况修改）
+const DAILY_TARGET = { cal: 1800, protein: 100, carbs: 180, fat: 60 };
+function f(n) { return Number(n).toFixed(1); }
+
+// ===== 饮食记录 =====
+// 格式：{ date: "YYYY-MM-DD", meal: "餐次", items: "食物描述", photo: "图片路径或空", cal: 热量, protein: 蛋白质, carbs: 碳水, fat: 脂肪, fiber: 纤维 }
+const MEALS = [
+  // 在这里添加饮食记录，例如：
+  // { date: "2026-01-01", meal: "早餐", items: "全麦面包2片+鸡蛋1个", photo: "", cal: 350, protein: 20, carbs: 40, fat: 10, fiber: 3 },
+];
+
+
+// ===== 体重记录 =====
+// 格式：{ date: "YYYY-MM-DD", weight: 体重数字或null, exercise: "运动", note: "备注", body: { bf: 体脂率, muscle: 肌肉量, visceral: 内脏脂肪, bmi: BMI } }
+// body 可为 null（无体成分数据时）
+const DATA = [
+  // 在这里添加体重记录，例如：
+  // { date: "2026-01-01", weight: 80.0, exercise: "", note: "起始", body: null },
+];
+
+const GOAL = 75.0; // 用户目标体重（修改此值）
+const GOAL_DATE = '目标日期（可修改）';
+// ===== 以下为渲染逻辑 =====
+// ===== 以下为渲染逻辑 =====
+const DAYS = ['日','一','二','三','四','五','六'];
+function dayOfWeek(d) { return DAYS[new Date(d).getDay()]; }
+function fmt(d) { return d.slice(5).replace('-','/'); }
+function diffDays(a, b) { return Math.round((new Date(b)-new Date(a))/86400000); }
+
+const withWeight = DATA.filter(d => d.weight !== null);
+
+if (withWeight.length < 1) {
+  document.getElementById('weeklyCards').innerHTML = '<div class="no-data glass"><div class="emoji">📝</div>还没有数据<br>zhangxuefang 快来报体重吧</div>';
+} else {
+  const first = withWeight[0];
+  const last = withWeight[withWeight.length - 1];
+  const days = diffDays(first.date, last.date);
+  const loss = first.weight - last.weight;
+  const weeks = days / 7 || 1;
+
+  document.getElementById('startW').textContent = first.weight.toFixed(1);
+  document.getElementById('startDate').textContent = fmt(first.date);
+  document.getElementById('currentW').textContent = last.weight.toFixed(1);
+  document.getElementById('currentDate').textContent = fmt(last.date);
+  document.getElementById('totalLoss').textContent = (loss >= 0 ? '-' : '+') + Math.abs(loss).toFixed(1) + 'kg';
+  document.getElementById('totalDays').textContent = days + '天';
+  document.getElementById('weeklyAvg').textContent = (loss / weeks).toFixed(2);
+
+  if (GOAL !== null) {
+    document.getElementById('goalW').textContent = GOAL.toFixed(1);
+    document.getElementById('goalDate').textContent = GOAL_DATE;
+    document.getElementById('toGoal').textContent = (last.weight - GOAL).toFixed(1) + 'kg';
+
+    const totalToLose = first.weight - GOAL;
+    const lost = first.weight - last.weight;
+    const pct = totalToLose > 0 ? Math.min(100, (lost / totalToLose * 100)).toFixed(0) : 0;
+    document.getElementById('pStart').textContent = first.weight.toFixed(1);
+    document.getElementById('pGoal').textContent = GOAL.toFixed(1);
+    document.getElementById('pPercent').textContent = pct + '%';
+    setTimeout(() => { document.getElementById('progressFill').style.width = pct + '%'; }, 100);
+  }
+
+  // Chart
+  const chartLabels = withWeight.map(d => fmt(d.date));
+  const chartData = withWeight.map(d => d.weight);
+
+  const gradient = document.getElementById('weightChart').getContext('2d');
+  const gFill = gradient.createLinearGradient(0, 0, 0, 300);
+  gFill.addColorStop(0, 'rgba(255, 127, 0, 0.25)');
+  gFill.addColorStop(1, 'rgba(255, 127, 0, 0.02)');
+
+  const datasets = [
+    {
+      label: '体重 (kg)',
+      data: chartData,
+      borderColor: '#FF7F00',
+      backgroundColor: gFill,
+      fill: true,
+      tension: 0.4,
+      borderWidth: 2.5,
+      pointBackgroundColor: '#fff',
+      pointBorderColor: '#FF7F00',
+      pointBorderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 8,
+    }
+  ];
+
+  if (GOAL !== null) {
+    datasets.push({
+      label: '目标 ' + GOAL + 'kg',
+      data: Array(chartLabels.length).fill(GOAL),
+      borderColor: 'rgba(76, 175, 80, 0.4)',
+      borderDash: [6, 4],
+      borderWidth: 1.5,
+      pointRadius: 0,
+      fill: false,
+    });
+  }
+
+  new Chart(document.getElementById('weightChart'), {
+    type: 'line',
+    data: { labels: chartLabels, datasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { size: 11 }, color: '#0066CC', usePointStyle: true, padding: 16 } },
+        tooltip: {
+          backgroundColor: 'rgba(255,240,245,0.95)',
+          titleColor: '#003366',
+          bodyColor: '#0066CC',
+          borderColor: 'rgba(233,30,99,0.2)',
+          borderWidth: 1,
+          cornerRadius: 10,
+          padding: 12,
+          callbacks: {
+            afterLabel: function(ctx) {
+              if (ctx.datasetIndex === 0) {
+                const d = withWeight[ctx.dataIndex];
+                let s = '';
+                if (d.exercise) s += '🏃 ' + d.exercise;
+                if (d.note) s += (s ? '\n' : '') + d.note;
+                return s;
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: GOAL ? Math.floor(GOAL - 1) : Math.floor(last.weight - 2),
+          max: Math.ceil(first.weight + 0.5),
+          ticks: { callback: v => v + 'kg', font: { size: 11 }, color: '#004080' },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        x: {
+          ticks: { font: { size: 10 }, maxRotation: 45, color: '#004080' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // Weekly cards
+  function getWeekNum(dateStr) { return Math.floor(diffDays(DATA[0].date, dateStr) / 7); }
+  const weekMap = {};
+  withWeight.forEach(d => {
+    const wk = getWeekNum(d.date);
+    if (!weekMap[wk]) weekMap[wk] = [];
+    weekMap[wk].push(d);
+  });
+  const weeklyEl = document.getElementById('weeklyCards');
+  Object.keys(weekMap).sort((a,b) => a-b).forEach(wk => {
+    const entries = weekMap[wk];
+    const wStart = entries[0].weight;
+    const wEnd = entries[entries.length-1].weight;
+    const wLoss = wStart - wEnd;
+    const card = document.createElement('div');
+    card.className = 'week-card glass';
+    card.innerHTML = `
+      <div class="wk">第${parseInt(wk)+1}周</div>
+      <div class="wv">${wLoss >= 0 ? '-' : '+'}${Math.abs(wLoss).toFixed(1)}kg</div>
+      <div class="wk">${wStart.toFixed(1)} → ${wEnd.toFixed(1)}</div>
+    `;
+    weeklyEl.appendChild(card);
+  });
+}
+
+// Table
+const tbody = document.getElementById('tableBody');
+let prevWeight = null;
+DATA.forEach(d => {
+  const tr = document.createElement('tr');
+  let changeHtml = '<span class="weight-same">-</span>';
+  if (d.weight !== null) {
+    if (prevWeight !== null) {
+      const diff = d.weight - prevWeight;
+      if (diff < 0) changeHtml = `<span class="weight-down">${diff.toFixed(1)}</span>`;
+      else if (diff > 0) changeHtml = `<span class="weight-up">+${diff.toFixed(1)}</span>`;
+      else changeHtml = `<span class="weight-same">0</span>`;
+    }
+    prevWeight = d.weight;
+  }
+  const exerciseHtml = d.exercise ? `<span class="exercise-tag">${d.exercise}</span>` : '';
+  const weightVal = d.weight !== null ? d.weight.toFixed(1) : '-';
+  let weightCell = `<td style="font-weight:600">${weightVal}`;
+  if (d.body) {
+    const b = d.body;
+    weightCell += `<span class="body-info"><span class="info-icon" onclick="this.nextElementSibling.classList.toggle('show')">ⓘ</span><span class="body-tip"><div class="tip-row"><span class="tip-label">体脂率</span><span class="tip-val">${b.bf}%</span></div><div class="tip-row"><span class="tip-label">肌肉量</span><span class="tip-val">${b.muscle}kg</span></div><div class="tip-row"><span class="tip-label">内脏脂肪</span><span class="tip-val">${b.visceral}</span></div>${b.bmi ? `<div class="tip-row"><span class="tip-label">BMI</span><span class="tip-val">${b.bmi}</span></div>` : ''}</span></span>`;
+  }
+  weightCell += '</td>';
+  tr.innerHTML = `
+    <td>${fmt(d.date)}</td>
+    <td>${dayOfWeek(d.date)}</td>
+    ${weightCell}
+    <td>${changeHtml}</td>
+    <td>${exerciseHtml}</td>
+    <td>${d.note || ''}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// Group meals by meal name for carousel (merge items of same meal into one card)
+function groupMeals(meals) {
+  const map = {};
+  meals.forEach(m => {
+    const key = m.meal;
+    if (!map[key]) map[key] = { meal: m.meal, items: [], photos: [], cal: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
+    map[key].items.push({ name: m.items, cal: m.cal });
+    if (m.photo) map[key].photos.push(m.photo);
+    map[key].cal += m.cal || 0;
+    map[key].protein += m.protein || 0;
+    map[key].carbs += m.carbs || 0;
+    map[key].fat += m.fat || 0;
+    map[key].fiber += m.fiber || 0;
+  });
+  return Object.values(map);
+}
+
+function buildCarousel(wrapEl, trackEl, dotsEl, grouped) {
+  let idx = 0;
+  grouped.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'carousel-card glass';
+    const photoHtml = g.photos.length === 1
+      ? `<img class="cc-photo" src="${g.photos[0]}" alt="${g.meal}" loading="lazy">`
+      : g.photos.length > 1
+        ? `<div class="cc-collage cc-collage-${Math.min(g.photos.length, 4)}">${g.photos.slice(0, 4).map(p => `<img src="${p}" alt="${g.meal}" loading="lazy">`).join('')}</div>`
+        : '';
+    const itemsHtml = g.items.map(i => `<div class="cc-item"><span>${i.name}</span><span>${f(i.cal)} kcal</span></div>`).join('');
+    card.innerHTML = `
+      <div class="cc-header"><span class="cc-meal">${g.meal}</span><span class="cc-cal">${f(g.cal)} kcal</span></div>
+      ${photoHtml}
+      <div class="cc-items">${itemsHtml}</div>
+      <div class="cc-macros">
+        <span>蛋白质 ${f(g.protein)}g</span><span>碳水 ${f(g.carbs)}g</span><span>脂肪 ${f(g.fat)}g</span>
+        ${g.fiber ? `<span>纤维 ${f(g.fiber)}g</span>` : ''}
+      </div>
+    `;
+    trackEl.appendChild(card);
+  });
+  // dots
+  grouped.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goTo(i);
+    dotsEl.appendChild(dot);
+  });
+  // arrows
+  if (grouped.length > 1) {
+    const prev = document.createElement('button');
+    prev.className = 'carousel-nav prev';
+    prev.innerHTML = '‹';
+    prev.onclick = () => goTo(Math.max(0, idx - 1));
+    const next = document.createElement('button');
+    next.className = 'carousel-nav next';
+    next.innerHTML = '›';
+    next.onclick = () => goTo(Math.min(grouped.length - 1, idx + 1));
+    wrapEl.appendChild(prev);
+    wrapEl.appendChild(next);
+  }
+  function goTo(i) {
+    idx = i;
+    trackEl.style.transform = `translateX(-${i * 100}%)`;
+    dotsEl.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i));
+  }
+  // swipe
+  let startX = 0;
+  trackEl.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+  trackEl.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) goTo(Math.max(0, Math.min(grouped.length - 1, idx + (diff > 0 ? 1 : -1))));
+  });
+}
+
+// Today's meals carousel
+const today = new Date().toISOString().slice(0, 10);
+const todayMeals = MEALS.filter(m => m.date === today);
+const todayTrack = document.getElementById('todayTrack');
+const todayDots = document.getElementById('todayDots');
+const todayCarousel = document.getElementById('todayCarousel');
+
+if (todayMeals.length === 0) {
+  todayCarousel.innerHTML = '<div class="no-meals glass">今天还没有饮食记录 🍽️</div>';
+} else {
+  const grouped = groupMeals(todayMeals);
+  buildCarousel(todayCarousel, todayTrack, todayDots, grouped);
+  document.getElementById('todaySummary').style.display = 'block';
+  let tCal = 0, tP = 0, tC = 0, tF = 0, tFiber = 0;
+  todayMeals.forEach(m => { tCal += m.cal||0; tP += m.protein||0; tC += m.carbs||0; tF += m.fat||0; tFiber += m.fiber||0; });
+  document.getElementById('todayCal').textContent = f(tCal);
+  document.getElementById('todayCalTarget').textContent = `/ ${DAILY_TARGET.cal} kcal`;
+  document.getElementById('todayP').textContent = f(tP);
+  document.getElementById('todayPTarget').textContent = `/ ${DAILY_TARGET.protein}g`;
+  document.getElementById('todayC').textContent = f(tC);
+  document.getElementById('todayCTarget').textContent = `/ ${DAILY_TARGET.carbs}g`;
+  document.getElementById('todayF').textContent = f(tF);
+  document.getElementById('todayFTarget').textContent = `/ ${DAILY_TARGET.fat}g`;
+  document.getElementById('todayFiber').textContent = f(tFiber);
+  document.getElementById('todayCount').textContent = grouped.length;
+}
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).style.display = 'block';
+  });
+});
+
+// Diet history (all days) - carousel per day
+const dietEl = document.getElementById('dietHistory');
+if (MEALS.length === 0) {
+  dietEl.innerHTML = '<div class="no-meals glass" style="margin:10px 0;">还没有饮食记录 🍽️</div>';
+} else {
+  const dayMap = {};
+  MEALS.forEach(m => { if (!dayMap[m.date]) dayMap[m.date] = []; dayMap[m.date].push(m); });
+  Object.keys(dayMap).sort().reverse().forEach(date => {
+    const meals = dayMap[date];
+    const dayCal = meals.reduce((s, m) => s + (m.cal || 0), 0);
+    const grouped = groupMeals(meals);
+
+    const section = document.createElement('div');
+    section.className = 'diet-day glass';
+    section.innerHTML = `
+      <div class="diet-day-header">
+        <span>${fmt(date)} 星期${dayOfWeek(date)}</span>
+        <span style="display:flex;align-items:center;gap:8px;">
+          <span class="day-cal">${f(dayCal)} kcal</span>
+          <span class="toggle-icon">›</span>
+        </span>
+      </div>
+      <div class="diet-day-body">
+        <div class="carousel-wrap"><div class="carousel-track"></div><div class="carousel-dots"></div></div>
+      </div>
+    `;
+    const header = section.querySelector('.diet-day-header');
+    const body = section.querySelector('.diet-day-body');
+    const icon = section.querySelector('.toggle-icon');
+    header.addEventListener('click', () => {
+      const open = body.style.display === 'block';
+      body.style.display = open ? 'none' : 'block';
+      icon.classList.toggle('open', !open);
+      if (!body.dataset.init) {
+        const cWrap = body.querySelector('.carousel-wrap');
+        buildCarousel(cWrap, cWrap.querySelector('.carousel-track'), cWrap.querySelector('.carousel-dots'), grouped);
+        body.dataset.init = '1';
+      }
+    });
+    dietEl.appendChild(section);
+  });
+}
+// Close body tooltips on outside click
+document.addEventListener('click', e => {
+  if (!e.target.classList.contains('info-icon')) {
+    document.querySelectorAll('.body-tip.show').forEach(t => t.classList.remove('show'));
+  }
+});
+</script>
+</body>
+</html>
