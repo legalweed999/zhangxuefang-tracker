@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>zhangxuefang 减脂看板 🦞</title>
+<title>张雪芳 减脂看板 🦞</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -263,7 +263,7 @@
 </head>
 <body>
 
-<h1>⭐ zhangxuefang 的体重记录</h1>
+<h1>⭐ 张雪芳 的体重记录</h1>
 
 <div class="stats">
   <div class="stat-card glass">
@@ -382,45 +382,33 @@
 <div class="weekly" id="weeklyCards"></div>
 
 <div class="footer">
-  <div class="brand-line">虾教练·为zhangxuefang定制</div>
+  <div class="brand-line">虾教练·为张雪芳定制</div>
   <div class="thank-line">感谢Xiaohan一直以来的支持与鼓励</div>
   <div class="motto-line">让我们遇见更好的自己，帮人们过上更好的生活</div>
   <img src="nglogo.png" alt="NG Logo" class="footer-logo">
 </div>
 
 <script>
-// ===== zhangxuefang 的数据 =====
-// 每次更新在这里添加记录即可
+// ===== 张雪芳 的数据 =====
 
-// Daily targets
-const DAILY_TARGET = { cal: 1750, protein: 160, carbs: 165, fat: 50 };
 function f(n) { return Number(n).toFixed(1); }
 
 // ===== 用户数据区 =====
-// 在这里填入用户的数据即可
 
-// 每日营养目标（按用户情况修改）
-const DAILY_TARGET = { cal: 1800, protein: 100, carbs: 180, fat: 60 };
-function f(n) { return Number(n).toFixed(1); }
+// 每日营养目标
+const DAILY_TARGET = { cal: 1500, protein: 95, carbs: 175, fat: 46 };
 
 // ===== 饮食记录 =====
-// 格式：{ date: "YYYY-MM-DD", meal: "餐次", items: "食物描述", photo: "图片路径或空", cal: 热量, protein: 蛋白质, carbs: 碳水, fat: 脂肪, fiber: 纤维 }
 const MEALS = [
-  // 在这里添加饮食记录，例如：
-  // { date: "2026-01-01", meal: "早餐", items: "全麦面包2片+鸡蛋1个", photo: "", cal: 350, protein: 20, carbs: 40, fat: 10, fiber: 3 },
 ];
-
 
 // ===== 体重记录 =====
-// 格式：{ date: "YYYY-MM-DD", weight: 体重数字或null, exercise: "运动", note: "备注", body: { bf: 体脂率, muscle: 肌肉量, visceral: 内脏脂肪, bmi: BMI } }
-// body 可为 null（无体成分数据时）
 const DATA = [
-  // 在这里添加体重记录，例如：
-  // { date: "2026-01-01", weight: 80.0, exercise: "", note: "起始", body: null },
+  { date: "2026-05-26", weight: 53.7, exercise: "", note: "建档起始", body: null },
 ];
 
-const GOAL = 75.0; // 用户目标体重（修改此值）
-const GOAL_DATE = '目标日期（可修改）';
+const GOAL = 50.0;
+const GOAL_DATE = '';
 // ===== 以下为渲染逻辑 =====
 // ===== 以下为渲染逻辑 =====
 const DAYS = ['日','一','二','三','四','五','六'];
@@ -431,7 +419,7 @@ function diffDays(a, b) { return Math.round((new Date(b)-new Date(a))/86400000);
 const withWeight = DATA.filter(d => d.weight !== null);
 
 if (withWeight.length < 1) {
-  document.getElementById('weeklyCards').innerHTML = '<div class="no-data glass"><div class="emoji">📝</div>还没有数据<br>zhangxuefang 快来报体重吧</div>';
+  document.getElementById('weeklyCards').innerHTML = '<div class="no-data glass"><div class="emoji">📝</div>还没有数据<br>张雪芳 快来报体重吧</div>';
 } else {
   const first = withWeight[0];
   const last = withWeight[withWeight.length - 1];
