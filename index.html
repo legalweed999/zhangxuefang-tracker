@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+<!-- deploy-ts: 2026-05-27 23:56:57 -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -408,11 +409,11 @@ const MEALS = [
 // 格式：{ date: "YYYY-MM-DD", weight: 体重数字或null, exercise: "运动", note: "备注", body: { bf: 体脂率, muscle: 肌肉量, visceral: 内脏脂肪, bmi: BMI } }
 // body 可为 null（无体成分数据时）
 const DATA = [
-  // 在这里添加体重记录，例如：
-  // { date: "2026-01-01", weight: 80.0, exercise: "", note: "起始", body: null },
+  { date: "2026-05-26", weight: 54.5, exercise: "", note: "", body: null },
+  { date: "2026-05-27", weight: 53.05, exercise: "", note: "", body: null },
 ];
 
-const GOAL = 75.0; // 用户目标体重（修改此值）
+const GOAL = 50.0; // 用户目标体重（修改此值）
 const GOAL_DATE = '目标日期（可修改）';
 // ===== 以下为渲染逻辑 =====
 // ===== 以下为渲染逻辑 =====
