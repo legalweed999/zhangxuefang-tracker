@@ -390,25 +390,30 @@
 
 <script>
 // ===== 张雪芳 的数据 =====
+// ===== ⚠️ 由 deploy.py 自动生成，请勿手动修改 =====
 
+// 每日营养目标（按用户情况修改）
+const DAILY_TARGET = { cal: 1600, protein: 100, carbs: 180, fat: 50 };
 function f(n) { return Number(n).toFixed(1); }
 
-// ===== 用户数据区 =====
-
-// 每日营养目标
-const DAILY_TARGET = { cal: 1500, protein: 95, carbs: 175, fat: 46 };
-
 // ===== 饮食记录 =====
+// 格式：{ date: "YYYY-MM-DD", meal: "餐次", items: "食物描述", photo: "图片路径或空", cal: 热量, protein: 蛋白质, carbs: 碳水, fat: 脂肪, fiber: 纤维 }
 const MEALS = [
+  // 在这里添加饮食记录，例如：
+  // { date: "2026-01-01", meal: "早餐", items: "全麦面包2片+鸡蛋1个", photo: "", cal: 350, protein: 20, carbs: 40, fat: 10, fiber: 3 },
 ];
+
 
 // ===== 体重记录 =====
+// 格式：{ date: "YYYY-MM-DD", weight: 体重数字或null, exercise: "运动", note: "备注", body: { bf: 体脂率, muscle: 肌肉量, visceral: 内脏脂肪, bmi: BMI } }
+// body 可为 null（无体成分数据时）
 const DATA = [
-  { date: "2026-05-26", weight: 53.7, exercise: "", note: "建档起始", body: null },
+  // 在这里添加体重记录，例如：
+  // { date: "2026-01-01", weight: 80.0, exercise: "", note: "起始", body: null },
 ];
 
-const GOAL = 50.0;
-const GOAL_DATE = '';
+const GOAL = 75.0; // 用户目标体重（修改此值）
+const GOAL_DATE = '目标日期（可修改）';
 // ===== 以下为渲染逻辑 =====
 // ===== 以下为渲染逻辑 =====
 const DAYS = ['日','一','二','三','四','五','六'];
