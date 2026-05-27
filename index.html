@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<!-- deploy-ts: 2026-05-28 00:41:38 -->
+<!-- deploy-ts: 2026-05-28 01:05:05 -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -394,7 +394,7 @@
 // ===== ⚠️ 由 deploy.py 自动生成，请勿手动修改 =====
 
 // 每日营养目标（按用户情况修改）
-const DAILY_TARGET = { cal: 1600, protein: 100, carbs: 180, fat: 50 };
+const DAILY_TARGET = { cal: 1500, protein: 95, carbs: 175, fat: 7 };
 function f(n) { return Number(n).toFixed(1); }
 
 // ===== 饮食记录 =====
@@ -413,8 +413,8 @@ const MEALS = [
 // 格式：{ date: "YYYY-MM-DD", weight: 体重数字或null, exercise: "运动", note: "备注", body: { bf: 体脂率, muscle: 肌肉量, visceral: 内脏脂肪, bmi: BMI } }
 // body 可为 null（无体成分数据时）
 const DATA = [
-  { date: "2026-05-26", weight: 54.5, exercise: "", note: "", body: null },
-  { date: "2026-05-27", weight: 53.05, exercise: "", note: "", body: null },
+  // 在这里添加体重记录，例如：
+  // { date: "2026-01-01", weight: 80.0, exercise: "", note: "起始", body: null },
 ];
 
 const GOAL = 50.0; // 用户目标体重（修改此值）
