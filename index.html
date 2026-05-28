@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<!-- deploy-ts: 2026-05-28 10:20:43 -->
+<!-- deploy-ts: 2026-05-28 19:03:09 -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -394,18 +394,22 @@
 // ===== ⚠️ 由 deploy.py 自动生成，请勿手动修改 =====
 
 // 每日营养目标（按用户情况修改）
-const DAILY_TARGET = { cal: 1500, protein: 95, carbs: 175, fat: 46 };
+const DAILY_TARGET = { cal: 1500, protein: 95, carbs: 175, fat: 7 };
 function f(n) { return Number(n).toFixed(1); }
 
 // ===== 饮食记录 =====
 // 格式：{ date: "YYYY-MM-DD", meal: "餐次", items: "食物描述", photo: "图片路径或空", cal: 热量, protein: 蛋白质, carbs: 碳水, fat: 脂肪, fiber: 纤维 }
 const MEALS = [
-  { date: "2026-05-26", meal: "早餐", items: "双肽蛋白饮、胶原蛋白肽、水煮蛋、甜玉米、小番茄", photo: "", cal: 318, protein: 30.5, carbs: 36.0, fat: 7.9, fiber: 4.5 },
-  { date: "2026-05-26", meal: "午餐", items: "千张鸡蛋卷、虾仁炒三丁、茼蒿、小番茄", photo: "", cal: 354, protein: 36.0, carbs: 24.0, fat: 13.0, fiber: 10.0 },
-  { date: "2026-05-26", meal: "晚餐", items: "口蘑鸡腿肉、胡萝卜片、西兰花、燕麦粥、小番茄、烹饪油", photo: "", cal: 448, protein: 33.3, carbs: 33.5, fat: 20.8, fiber: 7.7 },
-  { date: "2026-05-27", meal: "早餐", items: "双肽蛋白饮、水煮蛋 × 2、红薯 × 1根（偏细长）、圣女果 × 9个", photo: "", cal: 485, protein: 60.5, carbs: 39.0, fat: 12.0, fiber: 5.0 },
-  { date: "2026-05-27", meal: "午餐", items: "米饭、青椒豆皮、卤蛋 × 1", photo: "", cal: 524, protein: 34.0, carbs: 51.0, fat: 21.5, fiber: 3.0 },
-  { date: "2026-05-27", meal: "晚餐", items: "海带丝、豆芽、紫甘蓝、芝麻酱（麻酱）", photo: "", cal: 151, protein: 6.0, carbs: 15.0, fat: 8.4, fiber: 7.0 },
+  { date: "2026-05-26", meal: "早餐", items: "双肽蛋白饮 2勺(30g), 胶原蛋白肽 5g, 水煮蛋 1个50g, 甜玉米 半根100g, 小番茄 8个120g", cal: 318.0, protein: 30.5, carbs: 36.0, fat: 7.9, fiber: 4.5 },
+  { date: "2026-05-26", meal: "午餐", items: "千张鸡蛋卷 半张50g+蛋1个, 虾仁炒三丁 虾60g+青豆30g+胡萝卜20g+玉米20g, 茼蒿 200g, 小番茄 5颗75g", cal: 354.0, protein: 36.0, carbs: 24.0, fat: 13.0, fiber: 10.0 },
+  { date: "2026-05-26", meal: "晚餐", items: "口蘑鸡腿肉 鸡肉150g+口蘑80g, 胡萝卜片 40g, 西兰花 40g, 燕麦粥 燕麦片30g, 小番茄 6颗100g…", cal: 448.0, protein: 33.3, carbs: 33.5, fat: 20.8, fiber: 7.7 },
+  { date: "2026-05-27", meal: "早餐", items: "双肽蛋白饮 2勺+1条, 水煮蛋 × 2 100g, 红薯 × 1根（偏细长）80g, 圣女果 × 9个 135g", cal: 485.0, protein: 60.5, carbs: 39.0, fat: 12.0, fiber: 5.0 },
+  { date: "2026-05-27", meal: "午餐", items: "米饭 150g（熟重）, 青椒豆皮 200g, 卤蛋 × 1 50g", cal: 524.0, protein: 34.0, carbs: 51.0, fat: 21.5, fiber: 3.0 },
+  { date: "2026-05-27", meal: "晚餐", items: "海带丝 150g, 豆芽 100g, 紫甘蓝 100g, 芝麻酱（麻酱）1勺15g", cal: 151.0, protein: 6.0, carbs: 15.0, fat: 8.4, fiber: 7.0 },
+  { date: "2026-05-28", meal: "早餐", items: "水煮蛋 × 1, 杂蔬沙拉（西兰花/黄瓜/番茄/鹰嘴豆/豆腐/金针菇等）250g, 调味（黑胡椒+亚麻籽油+醋）5g油", cal: 315.0, protein: 19.0, carbs: 21.6, fat: 17.5, fiber: 5.0 },
+  { date: "2026-05-28", meal: "加餐", items: "纽崔莱乐纤（羽衣甘蓝味）× 1袋", cal: 105.0, protein: 8.0, carbs: 14.0, fat: 2.5, fiber: 3.0 },
+  { date: "2026-05-28", meal: "午餐", items: "千张卷（卷葱）30g, 大拌菜（鸡丝/豆腐+鹰嘴豆+海带+黄瓜+花生等）300g, 调味汁 10g", cal: 440.0, protein: 35.0, carbs: 26.0, fat: 23.5, fiber: 6.0 },
+  { date: "2026-05-28", meal: "晚餐", items: "饼（1/8张）40g, 炒鸡蛋 × 2 100g, 口蘑 × 4 60g, 西兰花 × 3小朵 50g, 胡萝卜 20g…", cal: 425.0, protein: 17.5, carbs: 29.5, fat: 25.4, fiber: 2.5 },
 ];
 
 
@@ -413,11 +417,12 @@ const MEALS = [
 // 格式：{ date: "YYYY-MM-DD", weight: 体重数字或null, exercise: "运动", note: "备注", body: { bf: 体脂率, muscle: 肌肉量, visceral: 内脏脂肪, bmi: BMI } }
 // body 可为 null（无体成分数据时）
 const DATA = [
-  { date: "2026-05-26", weight: 53.7, exercise: "", note: "体脂28.2% 肌肉36.4kg 内脏脂肪7.0 BMI20.2", body: null },
-  { date: "2026-05-27", weight: 53.05, exercise: "", note: "体脂30.0% 肌肉35.6kg 内脏脂肪7.0", body: null },
+  { date: "2026-05-26", weight: 53.7, exercise: "", note: "", body: null },
+  { date: "2026-05-27", weight: 53.05, exercise: "", note: "对比5/26 53.70kg ⬇ 0.65kg", body: null },
+  { date: "2026-05-28", weight: 53.1, exercise: "", note: "↑0.15kg，生理期水肿消退中", body: null },
 ];
 
-const GOAL = 50.0; // 用户目标体重（修改此值）
+const GOAL = 75.0; // 用户目标体重（修改此值）
 const GOAL_DATE = '目标日期（可修改）';
 // ===== 以下为渲染逻辑 =====
 // ===== 以下为渲染逻辑 =====
